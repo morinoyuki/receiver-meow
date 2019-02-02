@@ -55,8 +55,6 @@ namespace Newbe.Mahua.Receiver.Meow
                         .As<IPrivateMessageReceivedMahuaEvent>();//私聊
                 builder.RegisterType<GroupMessageReceivedMahuaEvent>()
                         .As<IGroupMessageReceivedMahuaEvent>();//群聊
-                builder.RegisterType<GroupUploadedMahuaEvent1>()
-                        .As<IGroupUploadedMahuaEvent>();//上传文件
                 builder.RegisterType<GroupJoiningInvitationReceivedMahuaEvent>()
                         .As<IGroupJoiningInvitationReceivedMahuaEvent>();//入群邀请
                 builder.RegisterType<GroupMemberChangedMahuaEvent1>()

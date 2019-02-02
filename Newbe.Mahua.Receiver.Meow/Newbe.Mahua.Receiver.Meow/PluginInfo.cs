@@ -14,7 +14,7 @@
         /// 插件名称
         /// </summary>
 
-        public string Name { get; set; } = "接待喵";
+        public string Name { get; set; } = "luaRobot";
 
         /// <summary>
         /// 作者名称
@@ -29,6 +29,6 @@
         /// <summary>
         /// 插件描述
         /// </summary>
-        public string Description { get; set; } = "接待喵所使用的插件";
+        public string Description { get; set; } = "lua机器人插件";
     }
 }

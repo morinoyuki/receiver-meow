@@ -20,10 +20,7 @@ namespace Newbe.Mahua.Receiver.Meow.MahuaEvents
 
         public void ProcessJoinGroupRequest(GroupJoiningRequestReceivedContext context)
         {
-            if (context.FromQq == Tools.adminNumber)
-                _mahuaApi.AcceptGroupJoiningInvitation(context.GroupJoiningRequestId, context.ToGroup, context.FromQq);
-            else
-                _mahuaApi.RejectGroupJoiningInvitation(context.GroupJoiningRequestId, context.ToGroup, context.FromQq, "已停止加群，如有需要请联系开发者");
+            _mahuaApi.RejectGroupJoiningInvitation(context.GroupJoiningRequestId, context.ToGroup, context.FromQq, "禁止加群，如有需要请联系开发者");
         }
     }
 }

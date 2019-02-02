@@ -1,4 +1,4 @@
-JSON = require("JSON")
+JSONLIB = require("JSON")
 utils = require("utils")
 
 --加强随机数随机性
@@ -17,68 +17,19 @@ function print(...)
     end
 end
 
---返回at某人的字符串
-function at(qq)
-    return "[CQ:at,qq="..tostring(qq).."]"
-end
-
---httpGet获取
-function httpGet(url,para,timeout)
-    if not para then para = "" end
-    if not timeout then timeout = 5000 end
-    local result = httpGet_row(url,para,timeout)
-    if result ~= "" then return result end
-end
-
---httpPost获取
-function httpPost(url,para,timeout)
-    if not para then para = "" end
-    if not timeout then timeout = 5000 end
-    local result = httpPost_row(url,para,timeout)
-    if result ~= "" then return result end
-end
-
---存储数据
-function setData(qq,name,str)
-    assert(type(qq) == "string", "setData invalid first partment("..type(qq)..") must be string")
-    assert(type(name) == "string", "setData invalid second partment("..type(name)..") must be string")
-    assert(type(str) == "string", "setData invalid third partment("..type(str)..") must be string")
-    assert(name:len() >= 10, "setData second partment too short("..tostring(name:len())..") must more then 10 byte")
-    setData_row(qq,name,str)
-end
-
---读取数据
-function getData(qq,name,str)
-    assert(type(qq) == "string", "getData invalid first partment("..type(qq)..") must be string")
-    assert(type(name) == "string", "getData invalid second partment("..type(name)..") must be string")
-    local result = getData_row(qq,name)
-    return result
-end
-
---安全的，带解析结果返回的json解析函数
-function jsonDecode(s)
-    local result, info = pcall(function(t) return JSON:decode(t) end, s)
-    if result then
-        return info, true
-    else
-        return {}, false, info
+json = {
+    decode = function (s)--安全的，带解析结果返回的json解析函数
+        local result, info = pcall(function(t) return JSONLIB:decode(t) end, s)
+        if result then
+            return info, true
+        else
+            return {}, false, info
+        end
+    end,
+    encode = function (t)
+        return JSONLIB:encode(t)
     end
-end
-
---显示某张图片
-function image(url,ban)
-    str = "1234567890ABCDEFHIJKLMNOPQRSTUVWXYZ"
-    local ret = ""
-    for i = 1, 20 do
-        local rchr = math.random(1, string.len(str))
-        ret = ret .. string.sub(str, rchr, rchr)
-    end
-    local b = false
-    if ban then b = true end
-    if fileDownload(url,ret,5000,b) then
-        return "[CQ:image,file=download\\"..ret.."]"
-    end
-end
+}
 
 --安全的函数
 local safeFunctions = {
@@ -103,21 +54,8 @@ local safeFunctions = {
     _G = true,
     lua_run_result_var = true,
     os = true,
-    at = true,
-    httpGet_row = true,
-    httpGet = true,
-    httpPost_row = true,
-    httpPost = true,
-    JSON = true,
-    encodeChange = true,
-    urlEncode_row = true,
-    setData_row = true,
-    getData_row = true,
-    setData = true,
-    getData = true,
-    jsonDecode = true,
-    fileDownload = true,
-    image = true,
+    JSONLIB = true,
+    json = true,
 }
 
 --安全的os函数
