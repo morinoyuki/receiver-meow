@@ -75,7 +75,7 @@ namespace Newbe.Mahua.Receiver.Meow.MahuaApis
             else if(msg.ToUpper()=="！LUA")
             {
                 result += @"lua功能使用帮助：
-lua 加 代码 直接运行
+#lua 加 代码 直接运行
 ！luaadd 关键词：代码
 ！luadel 关键词
 ！lualist
