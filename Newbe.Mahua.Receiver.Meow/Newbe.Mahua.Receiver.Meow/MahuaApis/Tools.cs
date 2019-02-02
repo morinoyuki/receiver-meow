@@ -85,7 +85,7 @@ namespace Newbe.Mahua.Receiver.Meow.MahuaApis
             LuaTimeout lua = new LuaTimeout();
             lua.code = text;
             lua.headRun = headRun;
-            lua.CallWithTimeout(8000);
+            lua.CallWithTimeout(3000);
             return lua.result;
         }
     }
@@ -99,10 +99,9 @@ namespace Newbe.Mahua.Receiver.Meow.MahuaApis
         public string result = "lua脚本运行超时，请检查代码";
         public string code;
         public string headRun = "";
-
+        NLua.Lua lua = new NLua.Lua();
         public void Run(string code)
         {
-            NLua.Lua lua = new NLua.Lua();
             lua["lua_run_result_var"] = "";
             try
             {
@@ -118,8 +117,11 @@ namespace Newbe.Mahua.Receiver.Meow.MahuaApis
             }
             catch (Exception e)
             {
-                result = "代码崩掉啦\r\n" + e.Message;
-
+                string err = e.Message;
+                int l = err.IndexOf("lua/");
+                if (l >= 0)
+                    err = err.Substring(l);
+                result = "代码崩掉啦\r\n" + err;
             }
         }
 
@@ -140,6 +142,11 @@ namespace Newbe.Mahua.Receiver.Meow.MahuaApis
             else
             {
                 threadToKill.Abort();
+                try
+                {
+                    lua.Dispose();
+                }
+                catch { }
             }
         }
 
