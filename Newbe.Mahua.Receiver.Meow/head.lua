@@ -48,6 +48,33 @@ pack = {
     unpack = struct.unpack,
 }
 
+local Stream = require("lockbox.util.stream")
+local Base64 = require("lockbox.util.base64")
+local Md5 = require("lockbox.digest.md5")
+crypto = {
+    base64_encode = function (s,len)
+        if len then
+            return Base64.fromString(s:sub(1,len))
+        else
+            return Base64.fromString(s)
+        end
+    end,
+    base64_decode = function (s,len)
+        if len then
+            return Base64.toString(s:sub(1,len))
+        else
+            return Base64.toString(s)
+        end
+    end,
+    md5 = function (s,len)
+        if len then
+            return Md5().update(Stream.fromString(s:len())).finish().asHex();
+        else
+            return Md5().update(Stream.fromString(s)).finish().asHex();
+        end
+    end
+}
+
 --安全的函数
 local safeFunctions = {
     assert = true,
@@ -75,6 +102,8 @@ local safeFunctions = {
     json = true,
     loadstring = true,
     pack = true,
+    lockbox = true,
+    crypto = true,
 }
 
 --安全的os函数
