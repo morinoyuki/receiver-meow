@@ -6,8 +6,11 @@ BIT = require("bit")
 --加强随机数随机性
 math.randomseed(tostring(os.time()):reverse():sub(1, 6))
 
+local lineCount = 0
 --重写print函数
 function print(...)
+    local maxLine = 10
+    if lineCount >= maxLine then return end
     if lua_run_result_var ~= "" then
         lua_run_result_var = lua_run_result_var.."\r\n"
     end
@@ -16,6 +19,10 @@ function print(...)
         if i ~= select('#', ...) then
             lua_run_result_var = lua_run_result_var.."\t"
         end
+    end
+    lineCount = lineCount + 1
+    if lineCount == maxLine then
+        lua_run_result_var = lua_run_result_var.."\r\n...\r\n余下输出过多，自动省略"
     end
 end
 
