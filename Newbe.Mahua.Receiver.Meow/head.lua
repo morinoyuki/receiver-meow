@@ -1,6 +1,7 @@
 JSONLIB = require("JSON")
 utils = require("utils")
 struct = require("struct")
+BIT = require("bit")
 
 --加强随机数随机性
 math.randomseed(tostring(os.time()):reverse():sub(1, 6))
@@ -75,6 +76,11 @@ crypto = {
     end
 }
 
+bit = BIT.bit32
+bit.bit = function(b) return bit.lshift(1,b) end
+bit.isset = function(v,p) return bit.rshift(v,p) % 2 == 1 end
+bit.isclear = function(v,p) return not bit.isset(v,p) end
+
 --安全的函数
 local safeFunctions = {
     assert = true,
@@ -104,6 +110,7 @@ local safeFunctions = {
     pack = true,
     lockbox = true,
     crypto = true,
+    bit = true,
 }
 
 --安全的os函数
