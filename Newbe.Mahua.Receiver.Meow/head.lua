@@ -40,6 +40,8 @@ function trace (event, line)
 end
 debug.sethook(trace, "l")
 
+loadstring = load
+
 --安全的函数
 local safeFunctions = {
     assert = true,
@@ -65,6 +67,7 @@ local safeFunctions = {
     os = true,
     JSONLIB = true,
     json = true,
+    loadstring = true,
 }
 
 --安全的os函数

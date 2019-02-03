@@ -85,7 +85,7 @@ namespace Newbe.Mahua.Receiver.Meow.MahuaApis
             LuaTimeout lua = new LuaTimeout();
             lua.code = text;
             lua.headRun = headRun;
-            lua.CallWithTimeout(3000);
+            lua.CallWithTimeout(10000);
             return lua.result;
         }
     }
