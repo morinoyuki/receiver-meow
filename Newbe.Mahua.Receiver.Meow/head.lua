@@ -1,5 +1,6 @@
 JSONLIB = require("JSON")
 utils = require("utils")
+struct = require("struct")
 
 --加强随机数随机性
 math.randomseed(tostring(os.time()):reverse():sub(1, 6))
@@ -42,6 +43,11 @@ debug.sethook(trace, "l")
 
 loadstring = load
 
+pack = {
+    pack = struct.pack,
+    unpack = struct.unpack,
+}
+
 --安全的函数
 local safeFunctions = {
     assert = true,
@@ -68,6 +74,7 @@ local safeFunctions = {
     JSONLIB = true,
     json = true,
     loadstring = true,
+    pack = true,
 }
 
 --安全的os函数
