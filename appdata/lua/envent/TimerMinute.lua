@@ -42,12 +42,14 @@ if time.min % 10 == 0 then--十分钟检查一次
         local text = "发现2G lua代码在GitHub上有更新\r\n"..t
         cqSendGroupMessage(952343033, text)
         cqSendGroupMessage(604902189, text)
+        cqSendGroupMessage(670342655, text)
     end
     local r4,t4 = checkGitHub("https://github.com/openLuat/Luat_4G_ASR_1802/commits/master.atom","4g")
     if r4 and t4 then
         local text = "发现4G lua代码在GitHub上有更新\r\n"..t4
         cqSendGroupMessage(952343033, text)
         cqSendGroupMessage(604902189, text)
+        cqSendGroupMessage(670342655, text)
         cqSendGroupMessage(851800257, text)--4g群
     end
 end
