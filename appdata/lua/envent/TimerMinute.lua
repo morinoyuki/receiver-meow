@@ -35,6 +35,26 @@ function checkGitHub(url,save)
 end
 
 
+function checkGitRelease(url,save)
+    local release = apiHttpGet(url)
+    local d,r,e = jsonDecode(release)
+    if not r then return end
+    if d.id and tostring(d.id) ~= apiXmlGet("settings",save) then
+        apiXmlSet("settings",save,tostring(d.id))
+        --缩短网址
+        local shortUrl = apiHttpPost("https://git.io/create","url="..d.html_url:urlEncode())
+        shortUrl = (not shortUrl or shortUrl == "") and d.html_url or "https://biu.papapoi.com/"..shortUrl
+
+        --返回结果
+        local toSend = "更新时间(UTC)："..(d.created_at):gsub("T"," "):gsub("Z"," ").."\r\n"..
+        "版本："..d.tag_name.."\r\n"..
+        d.name.."\r\n"..
+        d.body.."\r\n"..
+        "查看更新："..shortUrl
+        return true,toSend
+    end
+end
+
 --检查GitHub项目是否有更新
 if time.min % 10 == 0 then--十分钟检查一次
     local r,t = checkGitHub("https://github.com/openLuat/Luat_2G_RDA_8955/commits/master.atom","2g")
@@ -44,9 +64,26 @@ if time.min % 10 == 0 then--十分钟检查一次
         cqSendGroupMessage(604902189, text)
         cqSendGroupMessage(670342655, text)
     end
-    local r4,t4 = checkGitHub("https://github.com/openLuat/Luat_4G_ASR_1802/commits/master.atom","4g")
-    if r4 and t4 then
-        local text = "发现4G lua代码在GitHub上有更新\r\n"..t4
+    r,t = checkGitHub("https://github.com/openLuat/Luat_4G_ASR_1802/commits/master.atom","4g")
+    if r and t then
+        local text = "发现4G lua代码在GitHub上有更新\r\n"..t
+        cqSendGroupMessage(952343033, text)
+        cqSendGroupMessage(604902189, text)
+        cqSendGroupMessage(670342655, text)
+        cqSendGroupMessage(851800257, text)--4g群
+    end
+
+    r,t = checkGitRelease("https://api.github.com/repos/openLuat/Luat_2G_RDA_8955/releases/latest","2gRelease")
+    if r and t then
+        local text = "发现2g底层在GitHub上更新\r\n"..t
+        cqSendGroupMessage(952343033, text)
+        cqSendGroupMessage(604902189, text)
+        cqSendGroupMessage(670342655, text)
+    end
+
+    r,t = checkGitRelease("https://api.github.com/repos/openLuat/Luat_4G_ASR_1802/releases/latest","4gRelease")
+    if r and t then
+        local text = "发现4g底层在GitHub上更新\r\n"..t
         cqSendGroupMessage(952343033, text)
         cqSendGroupMessage(604902189, text)
         cqSendGroupMessage(670342655, text)
