@@ -32,10 +32,10 @@ local apps = {
     {--查imei记录
         check = function ()
             return (msg:find("%[CQ:at,qq="..cqGetLoginQQ().."%]") or not group)
-                and msg:find("%d") and msg:match("%d+"):len() == 15
+                and msg:gsub("%[CQ:.-%]",""):find("%d") and msg:gsub("%[CQ:.-%]",""):match("%d+"):len() == 15
         end,
         run = function ()
-            local imei = msg:match("%d+")
+            local imei = msg:gsub("%[CQ:.-%]",""):match("%d+")
             local html = apiHttpGet("http://erp.openluat.com/factory/v1/info?imei="..imei)
             if not html and html == "" then return end
             local d,r,e  = jsonDecode(html)
