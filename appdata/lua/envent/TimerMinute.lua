@@ -73,6 +73,12 @@ if time.min % 10 == 0 then--十分钟检查一次
         cqSendGroupMessage(851800257, text)--4g群
     end
 
+    r,t = checkGitHub("https://github.com/Jie2GG/Native.Csharp.Frame/commits/Final.atom","Native.sdk")
+    if r and t then
+        local text = "发现sdk代码在GitHub上有更新\r\n"..t
+        cqSendGroupMessage(711841640, text)
+    end
+
     r,t = checkGitRelease("https://api.github.com/repos/openLuat/Luat_2G_RDA_8955/releases/latest","2gRelease")
     if r and t then
         local text = "发现2g底层在GitHub上更新\r\n"..t
