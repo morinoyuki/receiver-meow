@@ -41,7 +41,7 @@ local apps = {
             local d,r,e  = jsonDecode(html)
             if not r then return end
             if d["error"] == 0 then
-                sendMessage(cqCode_At(qq).."\r\n"..
+                sendMessage((group and cqCode_At(qq).."\r\n" or "")..
                 "IMEI:"..d.imei.."\r\n"..
                 "工单号:"..d.order_id.."\r\n"..
                 "袋号:"..d.packed_packet_id.."\r\n"..
@@ -54,6 +54,22 @@ local apps = {
             else
                 sendMessage(cqCode_At(qq).."\r\n".."查询出错:"..d.message)
             end
+
+            if not group then--私聊回复设备信息
+                local cookie = apiXmlGet("settings", "iotCookie")
+                local html = apiHttpGet("https://iot.openluat.com/api/site/device/"..imei.."/info",nil,nil,cookie)
+                if not html or html == "" then sendMessage("设备绑定信息查询失败") end
+                local d,r,e  = jsonDecode(html)
+                if not r then return end
+                sendMessage(""..
+                "项目名："..d.data.project.."\r\n"..
+                "项目创建时间："..d.data.project_creation_time.."\r\n"..
+                "ProductKey："..d.data.project_key:sub(1,5).."...后面省略\r\n"..
+                "创建人："..d.data.project_creator.."\r\n"..
+                "创建人手机号："..d.data.project_creator_phone:sub(1,5).."...后面省略\r\n"..
+                "设备创建时间："..d.data.device_creation_time)
+            end
+
             return true
         end,
     }
