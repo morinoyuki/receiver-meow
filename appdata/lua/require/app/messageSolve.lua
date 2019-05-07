@@ -16,13 +16,13 @@ end
 local apps = {
     {--运行代码
         check = function ()
-            return msg:find("#lua") == 1 or msg:find("--lua") == 1
+            return msg:find("#lua") == 1 or msg:find("%-%-lua") == 1
         end,
         run = function ()
             local code
             if msg:find("#lua") == 1 then
                 code = cqCqCode_UnTrope(msg:sub(5))
-            elseif msg:find("--lua") == 1 then
+            elseif msg:find("%-%-lua") == 1 then
                 code = cqCqCode_UnTrope(msg:sub(6))
             end
             sendMessage(cqCode_At(qq).."\r\n"..apiSandBox(code))
