@@ -112,6 +112,7 @@ namespace Native.Csharp.App.LuaEnv
         {
             string result = Tools.GetRandomString(32, true, false, false, false, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
             bmp.Save(AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "data/image/" + result + ".luatemp", ImageFormat.Jpeg);
+            bmp.Dispose();
             return result + ".luatemp";
         }
 
@@ -165,7 +166,7 @@ namespace Native.Csharp.App.LuaEnv
                 request.Timeout = timeout;
                 request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36 Vivaldi/2.2.1388.37";
 
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                using HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 if (response.ContentLength < 1024 * 1024 * 20)//超过20M的文件不下载
                 {
                     return Tools.SaveBinaryFile(response, fileName);
@@ -209,14 +210,14 @@ namespace Native.Csharp.App.LuaEnv
                 if (cookie != "")
                     request.Headers.Add("cookie", cookie);
 
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                using HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 string encoding = response.ContentEncoding;
                 if (encoding == null || encoding.Length < 1)
                 {
                     encoding = "UTF-8"; //默认编码
                 }
-                Stream myResponseStream = response.GetResponseStream();
-                StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.GetEncoding(encoding));
+                using Stream myResponseStream = response.GetResponseStream();
+                using StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.GetEncoding(encoding));
 
                 string retString = myStreamReader.ReadToEnd();
                 myStreamReader.Close();
@@ -258,16 +259,16 @@ namespace Native.Csharp.App.LuaEnv
                 if (cookie != "")
                     request.Headers.Add("cookie", cookie);
 
-                Stream stream = request.GetRequestStream();
+                using Stream stream = request.GetRequestStream();
                 stream.Write(byteResquest, 0, byteResquest.Length);
                 stream.Close();
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                using HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 string encoding = response.ContentEncoding;
                 if (encoding == null || encoding.Length < 1)
                 {
                     encoding = "UTF-8"; //默认编码
                 }
-                StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(encoding));
+                using StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(encoding));
                 string retString = reader.ReadToEnd();
                 return retString;
             }
@@ -367,7 +368,7 @@ namespace Native.Csharp.App.LuaEnv
             try
             {
                 Bitmap bmp = new Bitmap(path);
-                MemoryStream ms = new MemoryStream();
+                using MemoryStream ms = new MemoryStream();
                 bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
                 byte[] arr = new byte[ms.Length];
                 ms.Position = 0;

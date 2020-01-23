@@ -1,6 +1,7 @@
-﻿using SimpleTCP;
+using SimpleTCP;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace Native.Csharp.App.LuaEnv
     class TcpServer
     {
         //需要发送的包列表
-        private static ArrayList toSend = new ArrayList();
+        private static ConcurrentBag<string> toSend = new ConcurrentBag<string>();
         //每个包发送间隔时间（可以自己改）
         private static int packTime = 1000;
 
@@ -39,16 +40,24 @@ namespace Native.Csharp.App.LuaEnv
             //消息发送队列
             Task.Run(() =>
             {
-                while(true)
+                try
                 {
-                    while (toSend.Count > 0)
+                    while (true)
                     {
-                        string temp = toSend[0].ToString();//取出第一个数据
-                        toSend.RemoveAt(0);
-                        server.Broadcast(temp);
-                        Task.Delay(packTime).Wait();
+                        while (toSend.Count > 0)
+                        {
+                            string temp;
+                            toSend.TryTake(out temp);
+                            server.Broadcast(temp);
+                            Task.Delay(packTime).Wait();
+                        }
+                        Task.Delay(200).Wait();//等等，防止卡死
                     }
-                    Task.Delay(200).Wait();//等等，防止卡死
+                }
+                catch(Exception e)
+                {
+                    Common.CqApi.AddLoger(Sdk.Cqp.Enum.LogerLevel.Fatal, "tcp server",
+                        "tcp server loop failed!\r\n" + e.Message);
                 }
             });
         }

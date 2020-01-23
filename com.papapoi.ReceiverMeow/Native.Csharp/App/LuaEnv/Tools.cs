@@ -82,8 +82,8 @@ namespace Native.Csharp.App.LuaEnv
             {
                 if (File.Exists(FileName))
                     File.Delete(FileName);
-                Stream outStream = System.IO.File.Create(FileName);
-                Stream inStream = response.GetResponseStream();
+                using Stream outStream = System.IO.File.Create(FileName);
+                using Stream inStream = response.GetResponseStream();
                 //inStream.ContentLength
                 int l;
                 do
