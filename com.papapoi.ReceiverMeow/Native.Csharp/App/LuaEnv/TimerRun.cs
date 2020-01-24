@@ -1,4 +1,4 @@
-﻿using LibGit2Sharp;
+using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,11 +24,11 @@ namespace Native.Csharp.App.LuaEnv
             timer.Elapsed += new System.Timers.ElapsedEventHandler(Timer1_Elapsed);
             timer.Start();
 
-            System.Timers.Timer timer2 = new System.Timers.Timer();
-            timer2.Enabled = true;
-            timer2.Interval = 60000;//1m
-            timer2.Elapsed += new System.Timers.ElapsedEventHandler(Timer2_Elapsed);
-            timer2.Start();
+            //System.Timers.Timer timer2 = new System.Timers.Timer();
+            //timer2.Enabled = true;
+            //timer2.Interval = 60000;//1m
+            //timer2.Elapsed += new System.Timers.ElapsedEventHandler(Timer2_Elapsed);
+            //timer2.Start();
         }
 
         public static void Timer1_Elapsed(object sender, System.Timers.ElapsedEventArgs e)  //1s定时程序
