@@ -180,6 +180,75 @@ namespace Native.Csharp.App.LuaEnv
         }
 
         /// <summary>
+        /// 直接从文件获取图片对象
+        /// </summary>
+        /// <param name="path">路径</param>
+        /// <returns>图片对象</returns>
+        public static Bitmap GetBitmap(string path)
+        {
+            if (File.Exists(path))
+            {
+                Bitmap bmp = new Bitmap(path);
+                return bmp;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 设置马赛克
+        /// </summary>
+        /// <param name="bmp">图片对象</param>
+        /// <param name="effect">影响范围</param>
+        /// <returns>图片对象</returns>
+        public static Bitmap SetMosaic(Bitmap bmp, int effect)
+        {
+            // 差异最多的就是以照一定范围取样 玩之后直接去下一个范围
+            for (int heightOfffset = 0; heightOfffset < bmp.Height; heightOfffset += effect)
+            {
+                for (int widthOffset = 0; widthOffset < bmp.Width; widthOffset += effect)
+                {
+                    int avgR = 0, avgG = 0, avgB = 0;
+                    int blurPixelCount = 0;
+
+                    for (int x = widthOffset; (x < widthOffset + effect && x < bmp.Width); x++)
+                    {
+                        for (int y = heightOfffset; (y < heightOfffset + effect && y < bmp.Height); y++)
+                        {
+                            Color pixel = bmp.GetPixel(x, y);
+
+                            avgR += pixel.R;
+                            avgG += pixel.G;
+                            avgB += pixel.B;
+
+                            blurPixelCount++;
+                        }
+                    }
+
+                    // 计算范围平均
+                    avgR = avgR / blurPixelCount;
+                    avgG = avgG / blurPixelCount;
+                    avgB = avgB / blurPixelCount;
+
+
+                    // 所有范围内都设定此值
+                    for (int x = widthOffset; (x < widthOffset + effect && x < bmp.Width); x++)
+                    {
+                        for (int y = heightOfffset; (y < heightOfffset + effect && y < bmp.Height); y++)
+                        {
+
+                            Color newColor = Color.FromArgb(avgR, avgG, avgB);
+                            bmp.SetPixel(x, y, newColor);
+                        }
+                    }
+                }
+            }
+            return bmp;
+        }
+
+        /// <summary>
         /// 摆放文字
         /// </summary>
         /// <param name="bmp">图片对象</param>
@@ -486,9 +555,9 @@ namespace Native.Csharp.App.LuaEnv
         public static string HttpUploadFile(string Url, string paramName, string path, long timeout = 5000, string cookie = "")
         {
             HttpWebRequest request = null;
-            if (path == null || path.Length < 1)
+            if (Url == null || Url.Length < 1 || paramName == null || paramName.Length < 1 || path == null || path.Length < 1 || !File.Exists(path))
             {
-                return null;
+                return "";
             }
             try
             {
@@ -547,7 +616,7 @@ namespace Native.Csharp.App.LuaEnv
             {
                 request?.Abort();
             }
-            return null;
+            return "";
         }
 
         ///<summary>
@@ -582,12 +651,43 @@ namespace Native.Csharp.App.LuaEnv
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public static string Base64File(string path)
+        public static string Base64File(string path, int targetWidth = 0, int targetHeight = 0)
         {
             try
             {
                 using Bitmap bmp = new Bitmap(path);
+                int width = 0;
+                int height = 0;
+
+                if (targetWidth > 0 && targetHeight > 0)
+                {
+                    width = targetWidth;
+                    height = targetHeight;
+                }
+                else if (targetWidth > 0 && targetHeight == 0)
+                {
+                    width = targetWidth;
+                    height = (targetWidth * bmp.Height) / bmp.Width;
+                }
+                else if (targetWidth == 0 && targetHeight > 0)
+                {
+                    height = targetHeight;
+                    width = (targetHeight * bmp.Width) / bmp.Height;
+                }
+
                 using MemoryStream ms = new MemoryStream();
+                if (targetWidth > 0 || targetHeight > 0)
+                {
+                    using Bitmap tbmp = new Bitmap(width, height);
+                    using Graphics gra = Graphics.FromImage(tbmp);
+                    gra.Clear(Color.Transparent);
+                    gra.DrawImage(bmp, 0, 0, width, height);
+                    tbmp.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                }
+                else
+                {
+                    bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                }
                 bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
                 byte[] arr = new byte[ms.Length];
                 ms.Position = 0;
@@ -600,6 +700,27 @@ namespace Native.Csharp.App.LuaEnv
                 Common.AppData.CQLog.Error("lua插件错误", $"base64错误：{e.Message}");
             }
             return "";
+        }
+
+        public static object GetPictureInfo(string image)
+        {
+            string fileName = Reg_get(image, "\\[CQ:image,file=(?<name>.*?)\\]", "name") + ".cqimg";
+            string filePath = AppDomain.CurrentDomain.SetupInformation.ApplicationBase + @"data\image\" + fileName;
+            if (File.Exists(filePath))
+            {
+                IniObject iObject = IniObject.Load(filePath, Encoding.Default);
+                IniSection section = iObject["image"];
+                return new
+                {
+                    md5 = section["md5"].ToString(),
+                    url = section["url"].ToString(),
+                    width = section["width"].ToInt32(),
+                    height = section["height"].ToInt32(),
+                    size = section["size"].ToString()
+                };
+
+            }
+            return null;//没这个文件
         }
 
         /// <summary>
